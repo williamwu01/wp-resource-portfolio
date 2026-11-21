@@ -1,7 +1,6 @@
 # WW Resources — resources.williamwu.info
 
 A WordPress resource library + tech news site, built as a subdomain of my portfolio (williamwu.info).
-Built from scratch as hands-on prep for a WordPress developer role (The West Harbour, Intermediate Developer) —
 custom post types, taxonomies, secure meta boxes, Settings API, a dynamic Gutenberg block pulling an external API,
 query work, and a custom theme.
 
