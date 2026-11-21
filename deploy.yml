@@ -1,0 +1,40 @@
+# Save as .github/workflows/deploy.yml in your repo
+name: Deploy to resources.williamwu.info
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ww-resources/**"
+      # - "ww-theme/**"   # uncomment once you build the theme
+  workflow_dispatch: # lets you trigger a deploy manually from the Actions tab
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy plugin
+        run: |
+          rsync -avz --delete \
+            --exclude ".git*" --exclude "node_modules" --exclude ".DS_Store" \
+            -e "ssh -p ${{ secrets.SSH_PORT }}" \
+            ww-resources/ \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.REMOTE_PATH }}/wp-content/plugins/ww-resources/"
+
+      # - name: Deploy theme
+      #   run: |
+      #     rsync -avz --delete \
+      #       --exclude ".git*" --exclude "node_modules" --exclude ".DS_Store" \
+      #       -e "ssh -p ${{ secrets.SSH_PORT }}" \
+      #       ww-theme/ \
+      #       "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.REMOTE_PATH }}/wp-content/themes/ww-theme/"
